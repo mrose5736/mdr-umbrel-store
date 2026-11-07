@@ -4,6 +4,7 @@ storage:
   dataRoot: data
 category: developer
 name: MDR-NEXUS
+icon: https://raw.githubusercontent.com/mrose5736/mdr-umbrel-store/main/mdr-nexus/icon.png
 version: "0.1.20"
 tagline: Your accounts as one read-only personal API
 description: >-
