@@ -1,0 +1,65 @@
+services:
+  app_proxy:
+    environment:
+      APP_HOST: mdr-nexus_web_1
+      APP_PORT: 8080
+      # Umbrel's login protects the portal. These stay public because callers cannot sign in to Umbrel:
+      # API clients send a Nexus API key, the health check is for monitors, and OAuth providers redirect
+      # the browser to the callback (Nexus verifies a signed state there).
+      PROXY_AUTH_WHITELIST: "/v1/*,/docs/*,/openapi*,/schemas/*,/healthz,/admin/api/oauth/*/callback"
+
+  web:
+    # Image reference is rewritten by the Nexus CI on every release: tag, then the multi-arch digest.
+    image: ghcr.io/mrose5736/mdr-nexus:0.1.0@sha256:0000000000000000000000000000000000000000000000000000000000000000
+    init: true
+    restart: on-failure
+    depends_on:
+      db:
+        condition: service_healthy
+    # OAuth client IDs and secrets (NEXUS_GOOGLE_CLIENT_ID=... one per line); optional, never in git.
+    env_file:
+      - path: ${APP_DATA_DIR}/data/nexus.env
+        required: false
+    environment:
+      DATABASE_URL: postgres://nexus:${APP_MDR_NEXUS_DB_PASSWORD}@mdr-nexus_db_1:5432/nexus?sslmode=disable
+      NEXUS_MASTER_KEY: ${APP_MDR_NEXUS_MASTER_KEY}
+      NEXUS_ADMIN_PASSWORD: ${APP_PASSWORD}
+      NEXUS_BASE_URL: https://nexus.mdr95.net
+      NEXUS_IP_HEADER: CF-Connecting-IP
+
+  db:
+    image: postgres:17@sha256:ff87138949ad9a46f32ff23bd6852b52ce024a13dffe9b4087be98292cdd3b4f
+    restart: on-failure
+    environment:
+      POSTGRES_USER: nexus
+      POSTGRES_PASSWORD: ${APP_MDR_NEXUS_DB_PASSWORD}
+      POSTGRES_DB: nexus
+      PGDATA: /var/lib/postgresql/data/pgdata # a subfolder, because the bind mount holds a .gitkeep and initdb needs an empty folder
+    volumes:
+      - ${APP_DATA_DIR}/data/postgres:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U nexus -d nexus"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+
+  # A dump now and then every 24 hours into data/backups, keeping 14 days. Restore with pg_restore (see README).
+  backup:
+    image: postgres:17@sha256:ff87138949ad9a46f32ff23bd6852b52ce024a13dffe9b4087be98292cdd3b4f
+    restart: on-failure
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      PGPASSWORD: ${APP_MDR_NEXUS_DB_PASSWORD}
+    volumes:
+      - ${APP_DATA_DIR}/data/backups:/backups
+    entrypoint: ["/bin/sh", "-c"]
+    command:
+      - |
+        while true; do
+          f=/backups/nexus-$$(date +%Y%m%d-%H%M%S).dump
+          if pg_dump -h mdr-nexus_db_1 -U nexus -Fc nexus > "$$f.tmp"; then mv "$$f.tmp" "$$f"; echo "backup written: $$f"; else rm -f "$$f.tmp"; echo "backup failed" >&2; fi
+          find /backups -name 'nexus-*.dump' -mtime +14 -delete
+          sleep 86400
+        done
