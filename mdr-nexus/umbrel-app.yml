@@ -5,7 +5,7 @@ storage:
 category: developer
 name: MDR-NEXUS
 icon: https://raw.githubusercontent.com/mrose5736/mdr-umbrel-store/main/mdr-nexus/icon.png
-version: "0.1.20"
+version: "0.1.21"
 tagline: Your accounts as one read-only personal API
 description: >-
   MDR-NEXUS polls your own accounts (GitHub, mail, Spotify, Steam, Octopus Energy, Xbox and more) and serves the latest figures as one read-only API with scoped API keys, plus a dashboard with trends, per-connector pages and an activity log.
@@ -16,7 +16,7 @@ description: >-
 
   Open the app, sign in with the password Umbrel shows for it, then add connectors under Connectors. To use Google, Spotify, Discord, Reddit, Twitch or Microsoft sign-in, put their client IDs and secrets in the nexus.env file in the app's data folder (see the store README).
 releaseNotes: |-
-  Release notes: drop git trailers; document the OAuth whitelist
+  Use the new logo in the portal, README and favicon
 developer: MDR Cloud
 website: https://mdrcloud.com
 repo: https://github.com/mrose5736/mdr-umbrel-store
