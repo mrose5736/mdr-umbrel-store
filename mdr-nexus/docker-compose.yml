@@ -10,7 +10,7 @@ services:
 
   web:
     # Image reference is rewritten by the Nexus CI on every release: tag, then the multi-arch digest.
-    image: ghcr.io/mrose5736/mdr-nexus:0.1.0@sha256:0000000000000000000000000000000000000000000000000000000000000000
+    image: ghcr.io/mrose5736/mdr-nexus:0.1.19@sha256:ace56820f88a68c9bbe64e53571816d47d79126b5032048060d5c21120293eb6
     init: true
     restart: on-failure
     depends_on:
