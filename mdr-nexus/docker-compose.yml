@@ -5,8 +5,8 @@ services:
       APP_PORT: 8080
       # Umbrel's login protects the portal. These stay public because callers cannot sign in to Umbrel:
       # API clients send a Nexus API key, the health check is for monitors, and OAuth providers redirect
-      # the browser to the callback (Nexus verifies a signed state there).
-      PROXY_AUTH_WHITELIST: "/v1/*,/docs/*,/openapi*,/schemas/*,/healthz,/admin/api/oauth/*/callback"
+      # the browser to the callback (Nexus verifies a signed state there). The start endpoint under the same prefix still needs the Nexus admin session.
+      PROXY_AUTH_WHITELIST: "/v1/*,/docs/*,/openapi*,/schemas/*,/healthz,/admin/api/oauth/*"
 
   web:
     # Image reference is rewritten by the Nexus CI on every release: tag, then the multi-arch digest.

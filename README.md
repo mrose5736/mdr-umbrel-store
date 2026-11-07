@@ -25,7 +25,7 @@ NEXUS_SPOTIFY_CLIENT_SECRET=...
 
 The names are listed in the Nexus documentation (`NEXUS_MS_`, `NEXUS_GOOGLE_`, `NEXUS_DISCORD_`, `NEXUS_SPOTIFY_`, `NEXUS_REDDIT_`, `NEXUS_TWITCH_`, each with `CLIENT_ID` and `CLIENT_SECRET`). This file is never committed anywhere.
 
-**What stays public through Umbrel's login:** `/v1/*` (API keys do the authentication), `/docs/*`, `/openapi*`, `/schemas/*`, `/healthz` and the OAuth callbacks.
+**What stays public through Umbrel's login:** `/v1/*` (API keys do the authentication), `/docs/*`, `/openapi*`, `/schemas/*`, `/healthz` and the OAuth sign-in endpoints (`/admin/api/oauth/*`; starting a sign-in still needs the Nexus admin session).
 
 **Backups:** a container writes a database dump into `~/umbrel/app-data/mdr-nexus/data/backups` every 24 hours and keeps 14 days. Restore with:
 
